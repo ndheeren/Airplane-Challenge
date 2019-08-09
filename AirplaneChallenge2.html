@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<style type="text/css">
+		#landscape {
+			background-image: url("resources/desert.jpg");
+			width: 1200px;
+			height: 800px;
+		}
+		.player {
+			position: absolute;
+			background-image: url("resources/playerJet.png");
+			width: 75px;
+			height: 75px;
+		}
+		.enemy {
+			position: absolute;
+			background-image: url("resources/enemyJet.png");
+			width: 75px;
+			height: 75px;
+		}
+		.missile {
+			position: absolute;
+			background-color: springgreen;
+			width: 2px;
+			height: 10px;
+		}
+	</style>
+
+	<div id="landscape">
+		<div id="players"></div>
+		<div id="enemies"></div>
+		<div id="missiles"></div>
+	</div>
+
+	<script type="text/javascript">
+	
+	var player = {
+		left: 450,
+		top: 620
+	}
+
+	var enemies = [
+		{left: 150, top: 100},
+		{left: 300, top: 200},
+		{left: 450, top: 150},
+		{left: 600, top: 200},
+		{left: 750, top: 150},
+		{left: 900, top: 250}
+	]
+
+	var missiles = []
+
+	var mapWidth = 1200; // in pixels
+	var mapHeight = 800; // in pixels
+	var playerWidth = 75; // in pixels
+	var playerHeight = 75; // in pixels
+
+	function runGameLoop() {
+		drawPlayer();
+
+		moveEnemies();
+		drawEnemies();
+
+		moveMissiles();
+		drawMissiles();
+
+		setTimeout(runGameLoop, 100);
+	}
+	runGameLoop();
+
+	// DRAWING FUNCTIONS
+	function drawPlayer() {
+		content = "<div class='player' style='left:"+player.left+"px; top:"+player.top+"px'></div>";
+		document.getElementById("players").innerHTML = content;
+	}
+
+	function drawEnemies() {
+		content = "";
+		//console.log(enemies);
+		for (var i = 0; i < enemies.length; i++) {
+			content += "<div class='enemy' style='left:"+enemies[i].left+"px; top:"+enemies[i].top+"px'></div>";
+		}
+		document.getElementById("enemies").innerHTML = content;
+	}
+
+	function drawMissiles() {
+		content = "";
+		for (var i = 0; i < missiles.length; i++) {
+			content += "<div class='missile' style='left:"+missiles[i].left+"px; top:"+missiles[i].top+"px'></div>";
+		}
+		document.getElementById("missiles").innerHTML = content;
+	}
+
+	// MOVEMENT FUNCTIONS
+	function moveEnemies() {
+		for (var i = 0; i < enemies.length; i++) {
+			enemies[i].top += 7;
+
+			if (enemies[i].top > mapHeight) {
+				enemies[i].top = 0; // resets the enemy back to the top
+			}
+		}
+	}
+
+	function moveMissiles() {
+		for (var i = 0; i < missiles.length; i++) {
+			missiles[i].top -= 15;
+		}
+	}
+
+	function attemptToMove(direction) {
+		switch (direction) {
+			case "up":
+				if (player.top - 10 >= (mapHeight / 3 * 1.8)) { // might be a way to simplify this
+					player.top -= 10;
+				}
+				break;
+			case "down":
+				if (player.top + 10 <= mapHeight - playerHeight) {
+					player.top += 10;
+				}
+			break;
+			case "left":
+				if (player.left - 10 >= 0) {
+					player.left -= 10;
+				}
+				break;
+			case "right":
+				if (player.left + 10 <= mapWidth - playerWidth) {
+					player.left += 10;
+				}
+			break;
+			default:
+				break;
+		}
+	}
+
+	// OTHER
+	document.onkeydown = function(e) {
+		//console.log(e);
+		if (e.keyCode == 38 || e.keyCode == 87) { // up
+			attemptToMove("up");
+		}
+		if (e.keyCode == 40 || e.keyCode == 83) { // down
+			attemptToMove("down");
+		}
+		if (e.keyCode == 37 || e.keyCode == 65) { // left
+			attemptToMove("left");
+		}
+		if (e.keyCode == 39 || e.keyCode == 68) { // right
+			attemptToMove("right");
+		}
+		if (e.keyCode == 32) { // fire (space bar)
+			missiles.push({left: (player.left + 37.5), top: (player.top - 8)});
+			drawMissiles();
+		}
+		drawPlayer();
+	}
+
+	</script>
+</body>
+</html>
